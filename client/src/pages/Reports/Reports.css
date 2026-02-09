@@ -1,0 +1,412 @@
+.reports-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.reports-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.reports-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-filter,
+.btn-generate,
+.btn-export {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.btn-filter {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-filter:hover {
+  background-color: #5a6268;
+}
+
+.btn-generate {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-generate:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.btn-generate:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-export {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-export:hover {
+  background-color: #218838;
+}
+
+.report-filters {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-filters h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.filter-group select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 200px;
+}
+
+.client-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.report-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.metrics-section {
+  margin-bottom: 3rem;
+}
+
+.metrics-section h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 2px solid #e9ecef;
+}
+
+.metric-card.healthy {
+  border-color: #d4edda;
+  background: #f0f9f2;
+}
+
+.metric-card.at-risk {
+  border-color: #fff3cd;
+  background: #fffef5;
+}
+
+.metric-card.critical {
+  border-color: #f8d7da;
+  background: #fef5f5;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.metric-percentage {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+.compliance-metrics {
+  margin-top: 2rem;
+}
+
+.compliance-metrics h4 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.compliance-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.compliance-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.compliance-item label {
+  min-width: 150px;
+  font-weight: 500;
+  color: #333;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 30px;
+  background: #e9ecef;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.client-summaries-table {
+  overflow-x: auto;
+}
+
+.client-summaries-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.client-summaries-table th,
+.client-summaries-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.client-summaries-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.healthy-cell {
+  color: #155724;
+  font-weight: 500;
+}
+
+.at-risk-cell {
+  color: #856404;
+  font-weight: 500;
+}
+
+.critical-cell {
+  color: #721c24;
+  font-weight: 500;
+}
+
+.health-percentage-bar {
+  position: relative;
+  height: 24px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.health-percentage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+}
+
+.health-percentage-bar span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.projects-list,
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-item,
+.delivery-item {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  border-left: 4px solid #e9ecef;
+}
+
+.project-item.at-risk {
+  border-left-color: #ffc107;
+  background: #fffef5;
+}
+
+.project-item.critical {
+  border-left-color: #dc3545;
+  background: #fef5f5;
+}
+
+.project-item-header,
+.delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.project-item-details,
+.delivery-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.delivery-text {
+  font-weight: 500;
+  color: #333;
+  margin-top: 0.25rem;
+}
+
+.risks {
+  color: #721c24;
+  font-style: italic;
+}
+
+.health-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.health-badge.health-green {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.health-badge.health-yellow {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.health-badge.health-red {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.report-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  color: #666;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
