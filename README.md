@@ -2,6 +2,12 @@
 
 A web application that allows tech leads to update project status through AI-powered transcription processing.
 
+## Live Deployment
+
+- **Frontend**: [https://project-status-tracker-client.vercel.app](https://project-status-tracker-client.vercel.app) (Vercel)
+- **Backend API**: [https://project-status-tracker-production.up.railway.app](https://project-status-tracker-production.up.railway.app) (Railway)
+- **Database**: Neon PostgreSQL (Serverless)
+
 ## Project Structure
 
 ```
