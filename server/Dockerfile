@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
 # Install Poetry
 RUN pip install --no-cache-dir poetry
 
-# Copy dependency files
-COPY pyproject.toml poetry.lock ./
+# Copy dependency files (and README required by Poetry metadata)
+COPY pyproject.toml poetry.lock README.md ./
 
 # Configure Poetry to not create virtual environment
 RUN poetry config virtualenvs.create false
