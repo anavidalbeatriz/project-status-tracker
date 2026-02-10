@@ -9,8 +9,7 @@
     "react-router-dom": "^6.20.1",
     "react-redux": "^9.0.4",
     "axios": "^1.6.2",
-    "typescript": "^5.3.3",
-    "serve": "^14.2.1"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
