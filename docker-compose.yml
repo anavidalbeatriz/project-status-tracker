@@ -17,5 +17,23 @@ services:
       retries: 5
     restart: unless-stopped
 
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: project-tracker-backend
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/project_tracker_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
