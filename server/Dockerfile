@@ -17,8 +17,8 @@ COPY pyproject.toml poetry.lock ./
 # Configure Poetry to not create virtual environment
 RUN poetry config virtualenvs.create false
 
-# Install dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+# Install dependencies (install all groups; Poetry 2.x removed --no-dev)
+RUN poetry install --no-interaction --no-ansi
 
 # Copy application code
 COPY . .
