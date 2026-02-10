@@ -150,7 +150,7 @@ const ProjectStatusDisplay: React.FC<ProjectStatusDisplayProps> = ({ projectId }
               <strong>On Scope:</strong>
             </label>
             {isEditing ? (
-              getStatusSelect('is_on_scope', formData.is_on_scope)
+              getStatusSelect('is_on_scope', formData.is_on_scope ?? null)
             ) : (
               getStatusBadge(latestStatus?.is_on_scope ?? null)
             )}
@@ -161,7 +161,7 @@ const ProjectStatusDisplay: React.FC<ProjectStatusDisplayProps> = ({ projectId }
               <strong>On Time:</strong>
             </label>
             {isEditing ? (
-              getStatusSelect('is_on_time', formData.is_on_time)
+              getStatusSelect('is_on_time', formData.is_on_time ?? null)
             ) : (
               getStatusBadge(latestStatus?.is_on_time ?? null)
             )}
@@ -172,7 +172,7 @@ const ProjectStatusDisplay: React.FC<ProjectStatusDisplayProps> = ({ projectId }
               <strong>On Budget:</strong>
             </label>
             {isEditing ? (
-              getStatusSelect('is_on_budget', formData.is_on_budget)
+              getStatusSelect('is_on_budget', formData.is_on_budget ?? null)
             ) : (
               getStatusBadge(latestStatus?.is_on_budget ?? null)
             )}

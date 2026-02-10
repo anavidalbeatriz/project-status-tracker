@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../services/api'
 
 interface Transcription {
@@ -40,7 +40,7 @@ const initialState: TranscriptionState = {
 // Async thunks
 export const fetchTranscriptions = createAsyncThunk(
   'transcriptions/fetchTranscriptions',
-  async (projectId?: number, { rejectWithValue }) => {
+  async (projectId: number | undefined, { rejectWithValue }) => {
     try {
       const params = projectId ? `?project_id=${projectId}` : ''
       const response = await api.get(`/transcriptions${params}`)

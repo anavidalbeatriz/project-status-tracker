@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { generateReport, clearReport, ReportFilters } from '../../store/slices/reportSlice'
+import { generateReport, ReportFilters } from '../../store/slices/reportSlice'
 import { fetchClients } from '../../store/slices/clientSlice'
 import './Reports.css'
 

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../services/api'
 
 export interface ProjectHealthMetrics {
@@ -82,7 +82,7 @@ const initialState: ReportState = {
 // Generate project health report
 export const generateReport = createAsyncThunk(
   'report/generateReport',
-  async (filters?: ReportFilters, { rejectWithValue }) => {
+  async (filters: ReportFilters | undefined, { rejectWithValue }) => {
     try {
       const params = new URLSearchParams()
       
@@ -129,7 +129,7 @@ const reportSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(generateReport.fulfilled, (state, action: PayloadAction<ProjectHealthReport>) => {
+      .addCase(generateReport.fulfilled, (state, action) => {
         state.loading = false
         state.report = action.payload
       })

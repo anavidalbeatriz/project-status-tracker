@@ -9,10 +9,9 @@ import './ProjectHealthBadge.css'
 
 interface ProjectHealthBadgeProps {
   projectId: number
-  compact?: boolean
 }
 
-const ProjectHealthBadge: React.FC<ProjectHealthBadgeProps> = ({ projectId, compact = false }) => {
+const ProjectHealthBadge: React.FC<ProjectHealthBadgeProps> = ({ projectId }) => {
   const [status, setStatus] = useState<ProjectStatusFields | null>(null)
   const [loading, setLoading] = useState(true)
 
