@@ -57,10 +57,6 @@ const Login: React.FC = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        
-        <p className="auth-link">
-          Don't have an account? <a href="/register">Register here</a>
-        </p>
       </div>
     </div>
   )

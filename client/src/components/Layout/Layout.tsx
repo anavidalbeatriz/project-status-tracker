@@ -41,7 +41,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           ) : (
             <div className="nav-auth">
               <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
             </div>
           )}
         </nav>
