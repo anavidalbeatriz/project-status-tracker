@@ -3,7 +3,7 @@ Transcription schemas.
 """
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.user import UserResponse
 from app.schemas.project import ProjectResponse
@@ -17,6 +17,17 @@ class TranscriptionBase(BaseModel):
 class TranscriptionCreate(TranscriptionBase):
     """Transcription creation schema."""
     pass
+
+
+class ManualTranscriptionCreate(BaseModel):
+    """Manual transcription creation schema that accepts raw text input."""
+    project_id: int
+    text: str = Field(..., min_length=1, description="Full transcription text")
+    title: Optional[str] = Field(
+        default=None,
+        max_length=255,
+        description="Optional label for the manual transcription entry"
+    )
 
 
 class TranscriptionResponse(TranscriptionBase):

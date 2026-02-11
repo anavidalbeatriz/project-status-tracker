@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { uploadTranscription, clearError } from '../../store/slices/transcriptionSlice'
+import { uploadTranscription, clearError, submitManualTranscription } from '../../store/slices/transcriptionSlice'
 import { AppDispatch, RootState } from '../../store/store'
 import './TranscriptionUpload.css'
 
@@ -14,6 +14,10 @@ const TranscriptionUpload: React.FC<TranscriptionUploadProps> = ({ projectId, on
   const { loading, error } = useSelector((state: RootState) => state.transcriptions)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
+  const [inputMode, setInputMode] = useState<'file' | 'text'>('file')
+  const [manualTitle, setManualTitle] = useState('')
+  const [manualText, setManualText] = useState('')
+  const [manualError, setManualError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const allowedExtensions = ['.mp3', '.wav', '.m4a', '.ogg', '.flac', '.webm', '.mp4', '.avi', '.mov', '.mkv', '.txt', '.doc', '.docx', '.pdf']
@@ -63,6 +67,46 @@ const TranscriptionUpload: React.FC<TranscriptionUploadProps> = ({ projectId, on
     }
   }
 
+  const handleModeChange = (mode: 'file' | 'text') => {
+    setInputMode(mode)
+    setManualError(null)
+    dispatch(clearError())
+
+    if (mode === 'text' && selectedFile) {
+      setSelectedFile(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleManualSubmit = async () => {
+    if (!manualText.trim()) {
+      setManualError('Please paste the transcription text.')
+      return
+    }
+
+    setManualError(null)
+    dispatch(clearError())
+
+    try {
+      await dispatch(
+        submitManualTranscription({
+          projectId,
+          text: manualText.trim(),
+          title: manualTitle.trim() || undefined,
+        })
+      ).unwrap()
+      setManualText('')
+      setManualTitle('')
+      if (onUploadSuccess) {
+        onUploadSuccess()
+      }
+    } catch (err) {
+      // Error handled by Redux slice
+    }
+  }
+
   const handleUpload = async () => {
     if (!selectedFile) {
       return
@@ -91,6 +135,23 @@ const TranscriptionUpload: React.FC<TranscriptionUploadProps> = ({ projectId, on
   return (
     <div className="transcription-upload">
       <h3>Upload Transcription</h3>
+
+      <div className="input-mode-toggle">
+        <button
+          type="button"
+          className={`toggle-button ${inputMode === 'file' ? 'active' : ''}`}
+          onClick={() => handleModeChange('file')}
+        >
+          Upload file
+        </button>
+        <button
+          type="button"
+          className={`toggle-button ${inputMode === 'text' ? 'active' : ''}`}
+          onClick={() => handleModeChange('text')}
+        >
+          Paste text
+        </button>
+      </div>
       
       {error && (
         <div className="error-message" onClick={() => dispatch(clearError())}>
@@ -98,61 +159,107 @@ const TranscriptionUpload: React.FC<TranscriptionUploadProps> = ({ projectId, on
         </div>
       )}
 
-      <div
-        className={`upload-area ${dragActive ? 'drag-active' : ''}`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileInputChange}
-          accept={allowedExtensions.join(',')}
-          style={{ display: 'none' }}
-        />
-        <div className="upload-content">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <p>Click to upload or drag and drop</p>
-          <p className="upload-hint">
-            Audio, Video, or Text files (max {maxSizeMB}MB)
-          </p>
-        </div>
-      </div>
-
-      {selectedFile && (
-        <div className="selected-file">
-          <div className="file-info">
-            <span className="file-name">{selectedFile.name}</span>
-            <span className="file-size">{formatFileSize(selectedFile.size)}</span>
-          </div>
-          <button
-            onClick={() => {
-              setSelectedFile(null)
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ''
-              }
-            }}
-            className="btn-remove"
+      {inputMode === 'file' ? (
+        <>
+          <div
+            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
           >
-            Remove
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileInputChange}
+              accept={allowedExtensions.join(',')}
+              style={{ display: 'none' }}
+            />
+            <div className="upload-content">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p>Click to upload or drag and drop</p>
+              <p className="upload-hint">
+                Audio, Video, or Text files (max {maxSizeMB}MB)
+              </p>
+            </div>
+          </div>
+
+          {selectedFile && (
+            <div className="selected-file">
+              <div className="file-info">
+                <span className="file-name">{selectedFile.name}</span>
+                <span className="file-size">{formatFileSize(selectedFile.size)}</span>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedFile(null)
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = ''
+                  }
+                }}
+                className="btn-remove"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={handleUpload}
+            disabled={!selectedFile || loading}
+            className="btn-upload"
+          >
+            {loading ? 'Uploading...' : 'Upload Transcription'}
+          </button>
+        </>
+      ) : (
+        <div className="manual-entry">
+          <label className="manual-label">
+            Optional title
+            <input
+              type="text"
+              value={manualTitle}
+              onChange={(e) => setManualTitle(e.target.value)}
+              placeholder="Sprint review notes, weekly sync, etc."
+              className="manual-title-input"
+            />
+          </label>
+
+          <label className="manual-label">
+            Paste transcription text
+            <textarea
+              value={manualText}
+              onChange={(e) => {
+                setManualText(e.target.value)
+                if (manualError) {
+                  setManualError(null)
+                }
+              }}
+              placeholder="Paste the meeting transcription or status notes here..."
+              className="manual-textarea"
+              rows={8}
+            />
+          </label>
+
+          <div className="manual-entry-footer">
+            <span className="char-count">{manualText.length.toLocaleString()} characters</span>
+            {manualError && <span className="manual-error">{manualError}</span>}
+          </div>
+
+          <button
+            onClick={handleManualSubmit}
+            disabled={!manualText.trim() || loading}
+            className="btn-upload"
+          >
+            {loading ? 'Saving...' : 'Use This Transcription'}
           </button>
         </div>
       )}
-
-      <button
-        onClick={handleUpload}
-        disabled={!selectedFile || loading}
-        className="btn-upload"
-      >
-        {loading ? 'Uploading...' : 'Upload Transcription'}
-      </button>
     </div>
   )
 }

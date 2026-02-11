@@ -1,6 +1,7 @@
 """
 Transcription management endpoints.
 """
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Query, BackgroundTasks
 from sqlalchemy.orm import Session
@@ -10,12 +11,58 @@ from app.db.database import get_db
 from app.db.models.transcription import Transcription
 from app.db.models.project import Project
 from app.db.models.user import User
-from app.schemas.transcription import TranscriptionResponse, TranscriptionDetailResponse
+from app.schemas.transcription import (
+    TranscriptionResponse,
+    TranscriptionDetailResponse,
+    ManualTranscriptionCreate,
+)
 from app.api.v1.endpoints.auth import get_current_user
 from app.utils.file_upload import save_uploaded_file, get_file_type, delete_file
 from app.services.openai_service import transcribe_audio_video, read_text_file
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+
+def _extract_status_from_text(
+    db: Session,
+    project: Project,
+    transcription_text: str,
+    updated_by: int
+) -> bool:
+    """Extract status information from text and persist it as a project status entry."""
+    if not transcription_text:
+        return False
+    
+    from app.db.models.project_status import ProjectStatus
+    from app.services.ai_status_extractor import extract_status_from_transcription, validate_extracted_status
+    
+    client_name = project.client.name if project.client else "Unknown"
+    extracted_status = extract_status_from_transcription(
+        transcription_text=transcription_text,
+        project_name=project.name,
+        client_name=client_name
+    )
+    
+    if not extracted_status:
+        logger.warning(f"Failed to extract status from transcription for project {project.id}")
+        return False
+    
+    validated_status = validate_extracted_status(extracted_status)
+    project_status = ProjectStatus(
+        project_id=project.id,
+        is_on_scope=validated_status.get("is_on_scope"),
+        is_on_time=validated_status.get("is_on_time"),
+        is_on_budget=validated_status.get("is_on_budget"),
+        next_delivery=validated_status.get("next_delivery"),
+        risks=validated_status.get("risks"),
+        updated_by=updated_by
+    )
+    
+    db.add(project_status)
+    db.commit()
+    logger.info(f"Status extracted and saved for project {project.id}")
+    return True
 
 
 async def process_transcription_background(
@@ -190,31 +237,7 @@ async def upload_transcription(
             db_transcription.processed_at = func.now()
             db.commit()
             db.refresh(db_transcription)
-            
-            # Extract status from text file immediately
-            from app.db.models.project_status import ProjectStatus
-            from app.services.ai_status_extractor import extract_status_from_transcription, validate_extracted_status
-            
-            client_name = project.client.name if project.client else "Unknown"
-            extracted_status = extract_status_from_transcription(
-                transcription_text=raw_text,
-                project_name=project.name,
-                client_name=client_name
-            )
-            
-            if extracted_status:
-                validated_status = validate_extracted_status(extracted_status)
-                project_status = ProjectStatus(
-                    project_id=project.id,
-                    is_on_scope=validated_status.get("is_on_scope"),
-                    is_on_time=validated_status.get("is_on_time"),
-                    is_on_budget=validated_status.get("is_on_budget"),
-                    next_delivery=validated_status.get("next_delivery"),
-                    risks=validated_status.get("risks"),
-                    updated_by=current_user.id
-                )
-                db.add(project_status)
-                db.commit()
+            _extract_status_from_text(db, project, raw_text, db_transcription.created_by)
     else:
         # Process audio/video in background
         background_tasks.add_task(
@@ -223,6 +246,49 @@ async def upload_transcription(
             file_path,
             file_type
         )
+    
+    return db_transcription
+
+
+@router.post("/text", response_model=TranscriptionResponse, status_code=status.HTTP_201_CREATED)
+async def create_transcription_from_text(
+    payload: ManualTranscriptionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Create a transcription directly from pasted text (no file upload)."""
+    project = db.query(Project).filter(Project.id == payload.project_id).first()
+    if project is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+    
+    raw_text = payload.text.strip()
+    if not raw_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Transcription text cannot be empty"
+        )
+    
+    file_name = (payload.title.strip() if payload.title else None) or "Manual transcription entry"
+    text_size_bytes = len(raw_text.encode("utf-8"))
+    
+    db_transcription = Transcription(
+        project_id=payload.project_id,
+        file_name=file_name,
+        file_type="text",
+        file_size=text_size_bytes,
+        raw_text=raw_text,
+        processed_at=func.now(),
+        created_by=current_user.id
+    )
+    
+    db.add(db_transcription)
+    db.commit()
+    db.refresh(db_transcription)
+    
+    _extract_status_from_text(db, project, raw_text, db_transcription.created_by)
     
     return db_transcription
 

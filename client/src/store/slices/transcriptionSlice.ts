@@ -71,6 +71,29 @@ export const uploadTranscription = createAsyncThunk(
   }
 )
 
+export const submitManualTranscription = createAsyncThunk(
+  'transcriptions/submitManualTranscription',
+  async (
+    { projectId, text, title }: { projectId: number; text: string; title?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const payload: { project_id: number; text: string; title?: string } = {
+        project_id: projectId,
+        text,
+      }
+      if (title && title.trim()) {
+        payload.title = title.trim()
+      }
+
+      const response = await api.post('/transcriptions/text', payload)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.detail || 'Failed to save transcription text')
+    }
+  }
+)
+
 export const deleteTranscription = createAsyncThunk(
   'transcriptions/deleteTranscription',
   async (transcriptionId: number, { rejectWithValue }) => {
@@ -121,6 +144,21 @@ const transcriptionSlice = createSlice({
         state.transcriptions.push(action.payload)
       })
       .addCase(uploadTranscription.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+    // Manual transcription submission
+    builder
+      .addCase(submitManualTranscription.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(submitManualTranscription.fulfilled, (state, action) => {
+        state.loading = false
+        state.transcriptions.push(action.payload)
+      })
+      .addCase(submitManualTranscription.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
