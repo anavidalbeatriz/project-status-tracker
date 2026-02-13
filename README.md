@@ -95,6 +95,35 @@ npm start
 
 See `IMPLEMENTATION_PLAN.md` for detailed implementation phases and progress.
 
+### MCP server for adding users
+
+This repo includes a small MCP server that can create application users by email and auto-generate a password.
+
+- **Location**: `mcp_add_user_server.py`
+- **Dependencies**: Managed in the server's Poetry project (`server/pyproject.toml`). Install with:
+
+  ```bash
+  cd server
+  poetry install
+  ```
+
+- **Configuration**:
+  - Set `PROJECT_STATUS_API_BASE_URL` to your backend API URL  
+    - Local example: `http://localhost:8000`  
+    - Production example: `https://project-status-tracker-production.up.railway.app`
+  - Optional: set `PORT` (default: `8080`) for the MCP server.
+
+- **Run the MCP server** (from repo root, using the server's Poetry env):
+
+  ```bash
+  cd server && poetry run python ../mcp_add_user_server.py
+  ```
+
+It exposes a single MCP tool, `add_user(email, name=None)`, which:
+- generates a secure random password
+- calls `/api/v1/auth/register` on the backend
+- returns the created user's basic info plus the generated password.
+
 ## License
 
 [Add your license here]
