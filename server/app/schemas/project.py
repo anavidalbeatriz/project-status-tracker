@@ -8,6 +8,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.schemas.user import UserResponse
+from app.schemas.client import ClientResponse
 
 
 class ProjectBase(BaseModel):
